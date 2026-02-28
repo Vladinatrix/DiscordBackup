@@ -16,17 +16,29 @@ CORE FEATURES
 - Maximum Compression: Archives are piped directly into tar and xz (Level 9) for an incredibly small, text-only storage footprint.
 
 ================================================================================
-PREREQUISITES
+EXTERNAL DEPENDENCIES & PREREQUISITES
 ================================================================================
 
-Before installing DCORDBK, ensure the host system has the following dependencies:
+To function, this suite orchestrates a specific stack of external binaries and standard Linux utilities. 
 
-1. DiscordChatExporter.Cli: The underlying C# engine. Must be installed globally.
-   Path expected: /usr/local/bin/DiscordChatExporter.Cli
-2. Whiptail: Required for the TUI. Standard on RHEL/CentOS.
-   sudo dnf install newt (CentOS/RHEL)
-   sudo apt install whiptail (Debian/Ubuntu)
-3. Standard POSIX Tools: awk, grep, sed, tar, xz.
+1. DiscordChatExporter.Cli (The Extraction Engine)
+   This is a third-party, open-source C# application created and maintained by Tyrrrz (Alexey Golub). It is responsible for all direct communication with the Discord API.
+   - Source: https://github.com/Tyrrrz/DiscordChatExporter
+   - Requirements: Requires the .NET Runtime (v8.0+) to be installed on the host system, unless the "self-contained" Linux binary is downloaded from the repository's Releases page.
+   - Path Expected: /usr/local/bin/DiscordChatExporter.Cli (Can be modified via the interactive installer or manually patched).
+
+2. Whiptail (The UI Engine)
+   The ncurses/newt visual rendering engine used to draw the configuration matrix.
+   - RHEL/CentOS: sudo dnf install newt
+   - Debian/Ubuntu: sudo apt install whiptail
+
+3. GNU/POSIX System Binaries
+   The suite relies on the following native system utilities for text processing, scheduling, and file management:
+   - Data Processing: awk, grep, sed, sort, cut, tr, head
+   - Compression: tar, xz
+   - File System: cat, mkdir, rm, mv, touch, mktemp, basename, dirname, readlink
+   - Scheduling & Privileges: sudo, crontab, chown, chmod, whoami, id
+   - Utilities: date, sleep, clear
 
 ================================================================================
 INSTALLATION
