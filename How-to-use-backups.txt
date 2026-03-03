@@ -1,0 +1,35 @@
+# How to use the backups you make
+
+Welcome! You have successfully set up the Discord Archive Suite (currently on version 0.2.10) and your computer is silently saving your history. But what exactly is it saving, and how do you look at it? 
+
+### 1. The Golden Rule: We are building a Museum, not a Time Machine
+The most common question we get is: *"How do I restore these messages back into Discord?"*
+
+**The short answer is: You cannot.** Discord's security architecture makes true "restoration" impossible. Discord does not allow users or bots to forge the author ID or timestamp of a message. If you were to build a bot to push your archived text back into a new server, every single message would show up as being written by the bot *today*, rather than by your friends three years ago. 
+
+This software is strictly a one-way read-and-archive engine. We are giving you a permanent, offline museum of your data so you never lose your memories, even if Discord goes offline or an account is deleted.
+
+### 2. The Master Log
+Even though we cannot push messages back, the software keeps a meticulous record of everything it sees. Inside your configuration folder, the suite maintains a master ledger. This is a master log of every single Server, Category, Channel, and Direct Message your account has access to, mapping their internal computer codes to their human-readable names. 
+
+### 3. Finding Your Files
+When the automated schedule runs, it drops your backups into your `Discord_Archive` folder. 
+
+* **If you are on Linux or a Virtual Machine:** You will find your backups sitting right in your home directory (e.g., `~/Discord_Archive/`). You can easily move these to your Mac or Windows machine using the Shared Folders we set up in the Virtual Machine guide.
+* **If you are on Windows using WSL:** You can access your hidden Linux files directly from Windows! Open your standard Windows File Explorer. In the address bar at the very top, type `\\wsl$\CentOS\home\` and press Enter. Click on your username, and you will see your `Discord_Archive` folder right there. You can drag and drop these files to your normal Windows Desktop.
+
+### 4. Opening the Archives (.tar.xz)
+To save massive amounts of hard drive space, our software squishes your backups into a highly compressed format called `.tar.xz`. Think of it like a super-powered `.zip` file.
+
+* **How to open it on Windows:** Standard Windows cannot open these yet. You will need to download a free, safe program called **7-Zip** (or WinRAR). Once installed, just right-click your backup file, select 7-Zip, and choose "Extract Here". 
+* **How to open it on Linux/Mac:** Open your terminal, navigate to the folder containing the backup, and type: `tar -xf filename.tar.xz` (replace 'filename' with the actual name of your file).
+
+### 5. Why are the folders laid out by ID numbers?
+When you extract your backups, you might notice that the system relies heavily on long strings of random numbers (Discord IDs) to organize things. 
+
+Why do we do this? Discord allows users to put almost anything in their server names—including emojis, crazy symbols, and strange spacing. If we tried to name a Linux folder using a dancing parrot emoji, the computer's file system would completely crash! By using Discord's unique numeric IDs, we guarantee your backups will never fail due to a weird character.
+
+**Please note:** This is an early release of the software (v0.2.10). We understand that reading ID numbers is not user-friendly. In future updates, we will be transitioning to more human-readable folder layouts as we build safer ways to translate emojis into standard text.
+
+--------------------------------------------------------------------------------
+Engineered by GuppyGIRL, and Hope Lockwood. Maintained by GuppyGIRL, and Yui Kirigaya.
