@@ -1,116 +1,92 @@
-Advice for the layman
-Welcome! If you are looking to back up your Discord servers and direct messages but have never touched a Linux terminal before, you are in the right place. We are going to take this one step at a time.
+# Advice for the layman
 
-Phase 1: The Engine You Need (Platform Agnostic)
-This backup suite is not just for Windows. You can run this software anywhere: on Windows, a Mac, a Cloud virtual machine, or a native dedicated server.
+Welcome! If you are looking to back up your Discord servers and direct messages but have never touched a Linux terminal before, you are in the right place. We are going to take this one step at a time. 
 
-The only requirement is that your engine must be running a flavor of Linux based on Red Hat Enterprise Linux (RHEL). Our software speaks their language perfectly. You can use any of the following RHEL-family operating systems:
+By the end of this guide, you will have a miniature Linux computer running silently inside your Windows computer, automatically saving your Discord history.
 
-Red Hat Enterprise Linux (RHEL)
+### Phase 1: The Engine You Need (Platform Agnostic)
 
-CentOS and CentOS Stream
+This backup suite is not just for Windows. You can run this software anywhere: on Windows, a Mac, a Cloud virtual machine, or a native dedicated server. 
 
-Rocky Linux
+The only requirement is that your engine must be running a flavor of Linux based on Red Hat Enterprise Linux (RHEL). Our software speaks their language perfectly. You can use any of the following RHEL-family operating systems: 
+* Red Hat Enterprise Linux (RHEL)
+* CentOS and CentOS Stream
+* Rocky Linux
+* AlmaLinux
+* Oracle Linux
+* EuroLinux
+* Amazon Linux (if you are running in the AWS Cloud)
 
-AlmaLinux
+If you are running on a Mac, in the Cloud, or on a native server, you will simply set up one of the operating systems above and skip straight to Phase 3. 
 
-Oracle Linux
-
-EuroLinux
-
-Amazon Linux (if you are running in the AWS Cloud)
-
-If you are running on a Mac, in the Cloud, or on a native server, you will simply set up one of the operating systems above and skip straight to Phase 3.
-
-(Note: If you are using a Mac or want to use full virtual machines on Windows like VMware Player or VirtualBox, please see our dedicated Virtual Machine Setup Guide. We have step-by-step instructions for those platforms there!)
+*(Note: If you are using a Mac or want to use full virtual machines on Windows like VMware Player or VirtualBox, please see our dedicated Virtual Machine Setup Guide. We have step-by-step instructions for those platforms there!)*
 
 If you are on a standard Windows computer, the easiest way to run this is using the built-in Windows Subsystem for Linux (WSL). Let's set that up now.
 
-Phase 2: Setting up your Linux Engine on Windows (WSL)
-Windows has a built-in feature called WSL. Think of it as a secure, virtual sandbox that lets you run Linux software right on your Windows desktop.
+### Phase 2: Setting up your Linux Engine on Windows (WSL)
 
-Enable WSL: Click your Windows Start menu, type PowerShell, right-click the PowerShell icon, and select Run as Administrator.
+Windows has a built-in feature called WSL. Think of it as a secure, virtual sandbox that lets you run Linux software right on your Windows desktop. 
 
-Type this exact command into the blue window and press Enter: wsl --install
+1. Enable WSL: Click your Windows Start menu, type `PowerShell`, right-click the PowerShell icon, and select Run as Administrator. 
+2. Type this exact command into the blue window and press Enter: `wsl --install`
+3. Restart your computer when it finishes.
+4. Get the Official CentOS Image: We need a specific flavor of Linux called CentOS. You can use either CentOS 9 Stream or CentOS 10 Stream; our software is built to work flawlessly on both. 
+   * Open your web browser and go to the official CentOS directories:
+     * For CentOS 9 Stream: `https://mirror.stream.centos.org/SIGs/9-stream/altimages/images/wsl/`
+     * For CentOS 10 Stream: `https://mirror.stream.centos.org/SIGs/10-stream/altimages/images/wsl/`
+   * CRITICAL STEP: When you click the link, look for the file that ends in `.wsl`. Do not download the `.tar` file! Download the `.wsl` file.
+5. Install the Image: Open PowerShell as Administrator again and "import" your new Linux brain by typing: 
+   `wsl --install --from-file C:\Users\YourUsername\Downloads\<name_of_the_file_you_downloaded>.wsl --name CentOS`
+   *(Hint: Because you downloaded it from your web browser, the `.wsl` file is almost certainly sitting right in your standard Windows Downloads folder!)*
+6. Start your new environment by typing: `wsl -d CentOS`
 
-Restart your computer when it finishes.
+### Phase 3: Connecting the Worlds
 
-Get the Official CentOS Image: We need a specific flavor of Linux called CentOS. You can use either CentOS 9 Stream or CentOS 10 Stream; our software is built to work flawlessly on both.
+Right now, you are inside Linux. But how do you access your normal Windows files? 
+Linux sees your Windows `C:\` drive a little differently. If you ever need to access your Windows Downloads folder from inside Linux, you will look for it here: `/mnt/c/Users/YourUsername/Downloads/`. We need to know this so we can easily move files between the two worlds.
 
-Open your web browser and go to the official CentOS directories:
+### Phase 4: Installing the Backup Software
 
-For CentOS 9 Stream: https://mirror.stream.centos.org/SIGs/9-stream/altimages/images/wsl/
-
-For CentOS 10 Stream: https://mirror.stream.centos.org/SIGs/10-stream/altimages/images/wsl/
-
-CRITICAL STEP: When you click the link, look for the file that ends in .wsl. Do not download the .tar file! Download the .wsl file.
-
-Install the Image: Open PowerShell as Administrator again and "import" your new Linux brain by typing:
-wsl --install --from-file C:\Users\YourUsername\Downloads\<name_of_the_file_you_downloaded>.wsl --name CentOS
-(Hint: Because you downloaded it from your web browser, the .wsl file is almost certainly sitting right in your standard Windows Downloads folder!)
-
-Start your new environment by typing: wsl -d CentOS
-
-Phase 3: Connecting the Worlds
-Right now, you are inside Linux. But how do you access your normal Windows files?
-Linux sees your Windows C:\ drive a little differently. If you ever need to access your Windows Downloads folder from inside Linux, you will look for it here: /mnt/c/Users/YourUsername/Downloads/. We need to know this so we can easily move files between the two worlds.
-
-Phase 4: Installing the Backup Software
 Now we will install the Discord Archive Suite. This suite relies on two main components: our management tool, and the core exporting engine.
 
-First, visit our official repository: https://github.com/Vladinatrix/DiscordBackup
+1. First, visit our official repository: https://github.com/Vladinatrix/DiscordBackup
+2. Download our `dcordbk-installer.bash` script. This will also likely save to your Windows Downloads folder.
+3. In your new CentOS terminal, navigate to that folder by typing: `cd /mnt/c/Users/YourUsername/Downloads/`
+4. Run the installer by typing: `bash dcordbk-installer.bash` 
+5. The screen will ask you to choose an installation type. Press 1 for a User Install. This safely creates the necessary folders right in your personal directory.
+6. Press y to confirm. The script will handle creating all the directories and setting permissions for you.
 
-Download our dcordbk-installer.bash script. This will also likely save to your Windows Downloads folder.
+### Phase 5: Setting up DiscordChatExporter
 
-In your new CentOS terminal, navigate to that folder by typing: cd /mnt/c/Users/YourUsername/Downloads/
+Under the hood, our tool relies on an excellent program called DiscordChatExporter to actually read and save the messages. 
 
-Run the installer by typing: bash dcordbk-installer.bash
+1. Visit the dependency repository here: https://github.com/Tyrrrz/DiscordChatExporter
+2. Follow the instructions on their page to download the Linux release.
+3. Extract those files into the `bin` folder that our installer created in Phase 4. This links the powerful exporter engine to our easy-to-use automatic schedule.
 
-The screen will ask you to choose an installation type. Press 1 for a User Install. This safely creates the necessary folders right in your personal directory.
+### Phase 6: Finding Your Token
 
-Press y to confirm. The script will handle creating all the directories and setting permissions for you.
-
-Phase 5: Setting up DiscordChatExporter
-Under the hood, our tool relies on an excellent program called DiscordChatExporter to actually read and save the messages.
-
-Visit the dependency repository here: https://github.com/Tyrrrz/DiscordChatExporter
-
-Follow the instructions on their page to download the Linux release.
-
-Extract those files into the bin folder that our installer created in Phase 4. This links the powerful exporter engine to our easy-to-use automatic schedule.
-
-Phase 6: Configuration and Finding Your Token
-The software is installed! Now we have to tell it what to back up. To do this, you need your Discord Token.
+The software is installed! Now we have to tell it what to back up. To do this, you need your Discord Token. 
 
 Why do we need a token? Your token is a secret string of text that acts as a digital ID card. It proves to Discord that it is actually you requesting to read and save your own messages. (Note: Never share this token with anyone!)
 
 How to find your Discord Token:
+1. Open Discord in your web browser (like Chrome or Firefox) and log in.
+2. Press F12 on your keyboard to open the Developer Tools panel. 
+3. Click on the Network tab at the top of this new panel.
+4. While the Network tab is open, click between a few different channels in Discord. You will see a lot of text start scrolling in the panel.
+5. In the "Filter" box inside the Network tab, type: messages
+6. Click on any of the items that appear in the list.
+7. Scroll down to the Request Headers section and look for a line labeled Authorization.
+8. The long string of letters and numbers next to Authorization is your Token. Copy it!
 
-Open Discord in your web browser (like Chrome or Firefox) and log in.
+### Phase 7: Mission Control
 
-Press F12 on your keyboard to open the Developer Tools panel.
-
-Click on the Network tab at the top of this new panel.
-
-While the Network tab is open, click between a few different channels in Discord. You will see a lot of text start scrolling in the panel.
-
-In the "Filter" box inside the Network tab, type messages.
-
-Click on any of the items that appear in the list.
-
-Scroll down to the Request Headers section and look for a line labeled Authorization.
-
-The long string of letters and numbers next to Authorization is your Token. Copy it!
-
-Phase 7: Mission Control
-Go back to your CentOS terminal and type dbkui to begin.
-
-The dbkui is your Mission Control menu.
-
-It will ask for the token you just copied. Paste it in.
-
-The system will run an Active Discovery, reaching out to Discord to safely map out all of your Servers and Direct Messages.
-
-Once complete, use the menu to select exactly what you want to back up, whether you want plain text or media (images/videos), and how often you want it to run automatically in the background.
+1. Go back to your CentOS terminal and type `dbkui` to begin.
+2. The system will immediately ask for the token you just copied. Paste it in and press Enter. 
+3. The suite will instantly recognize your token, clear the screen, and run an Automatic Discovery. It will reach out to Discord to safely map out all of your Servers and Categories without you having to press another button.
+4. Once the mapping is complete, the `dbkui` Mission Control menu will open.
+5. From here, select "Configure Automated Backups" to choose exactly what you want to save, whether you want plain text or media (images/videos).
+6. When you are finished configuring, return to the main menu and select "Write to Cron Schedule". This tells your Linux engine exactly when to wake up and run the backups silently in the background!
 
 Welcome to data independence!
