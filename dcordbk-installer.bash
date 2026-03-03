@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# Version: 0.2.4
+# Version: 0.2.5
 # Description: Unified Installer for DCORDBK Archival Suite & Hierarchical UI
 # Target OS: CentOS 9 Stream / RHEL 9
 # ==============================================================================
@@ -18,7 +18,7 @@ DO_INSTALL=false
 
 echo -e "${BLUE}"
 echo "========================================================"
-echo "    DCORDBK UNIFIED INSTALLER (v0.2.4)"
+echo "    DCORDBK UNIFIED INSTALLER (v0.2.5)"
 echo "========================================================"
 echo -e "${NC}"
 
@@ -146,14 +146,12 @@ active_discovery() {
                 id=$1; cat=$2; name=$3; 
                 if(name=="") { name=cat; cat="Uncategorized"; }
                 gsub(/^[ \t]+|[ \t]+$/, "", id); gsub(/^[ \t]+|[ \t]+$/, "", cat); gsub(/^[ \t]+|[ \t]+$/, "", name);
-                if(cat=="") cat="Uncategorized";
-                print id"|Channel|"gid"|"cat"|"name
+                if(cat=="") cat="Uncategorized"; print id"|Channel|"gid"|"cat"|"name
             }' >> /tmp/dbk_parsed_targets.txt
             rm /tmp/dbk_chans_${GID}.txt 2>/dev/null
         fi
     done < <(grep "|Guild|" /tmp/dbk_parsed_targets.txt)
     echo " Done."
-    
     echo "# VERSION: $LEDGER_VERSION" > "$ID_MAP_FILE"
     sort -u -t'|' -k1,1 /tmp/dbk_parsed_targets.txt >> "$ID_MAP_FILE"
     rm /tmp/dbk_guilds_raw.txt /tmp/dbk_parsed_targets.txt 2>/dev/null
@@ -186,7 +184,7 @@ while [[ "$#" -gt 0 ]]; do
         --html) FORMAT="HtmlDark"; shift ;;
         --json) FORMAT="Json"; shift ;;
         --text) FORMAT="PlainText"; shift ;;
-        *) shift ;; 
+        *) shift ;;
     esac
 done
 
@@ -196,19 +194,25 @@ else DIR_NAME="${DATE}_SELECTIVE"; fi
 
 OUT_BASE="$DBK_ARCHIVE_DIR/$DIR_NAME"
 
-if [ "$MODE" == "FULL" ]; then "$CMD" exportall -t "$DBK_TOKEN" $MEDIA --format "$FORMAT" --output "$OUT_BASE/"
-elif [ "$MODE" == "DMS" ]; then "$CMD" exportdm -t "$DBK_TOKEN" $MEDIA --format "$FORMAT" --output "$OUT_BASE/%c - %C"
+# Determine semantic extension based on payload format
+EXT=".txt"
+if [ "$FORMAT" == "HtmlDark" ]; then EXT=".html"; fi
+if [ "$FORMAT" == "Json" ]; then EXT=".json"; fi
+
+if [ "$MODE" == "FULL" ]; then "$CMD" exportall -t "$DBK_TOKEN" $MEDIA --format "$FORMAT" --output "$OUT_BASE/%g - %c$EXT"
+elif [ "$MODE" == "DMS" ]; then "$CMD" exportdm -t "$DBK_TOKEN" $MEDIA --format "$FORMAT" --output "$OUT_BASE/%c - %C$EXT"
 elif [ "$MODE" == "SELECTIVE" ]; then
     for ITEM in "${ARGS[@]}"; do
         TYPE="${ITEM%%:*}"; ID="${ITEM##*:}"
-        if [ "$TYPE" == "CHANNEL" ]; then "$CMD" export -c "$ID" -t "$DBK_TOKEN" $MEDIA --format "$FORMAT" --output "$OUT_BASE/Channels/%g/%c"
-        elif [ "$TYPE" == "GUILD" ]; then "$CMD" exportguild -g "$ID" -t "$DBK_TOKEN" $MEDIA --format "$FORMAT" --output "$OUT_BASE/Guilds/%g/%c"
+        if [ "$TYPE" == "CHANNEL" ]; then 
+            "$CMD" export -c "$ID" -t "$DBK_TOKEN" $MEDIA --format "$FORMAT" --output "$OUT_BASE/%g - %c$EXT"
+        elif [ "$TYPE" == "GUILD" ]; then 
+            "$CMD" exportguild -g "$ID" -t "$DBK_TOKEN" $MEDIA --format "$FORMAT" --output "$OUT_BASE/%g - %c$EXT"
         fi
     done
 fi
 
 EXPORT_EXIT=$?
-
 # Always harvest DM IDs if the folder exists, even if execution was aborted/failed
 if [ "$MODE" == "DMS" ] && [ -d "$OUT_BASE" ]; then
     for file in "$OUT_BASE"/*; do
@@ -409,6 +413,7 @@ menu_dms() {
         fi
         
         local sel=$(whiptail --title "Direct Messages" --cancel-button "Back" --menu "Select DM:" 22 70 14 "${opts[@]}" 3>&1 1>&2 2>&3)
+    
         [ $? -ne 0 ] && break
         [ -z "$sel" ] && break
         config_card "$sel" "$(grep "^$sel|" "$ID_MAP" | cut -d'|' -f5)" "DM"
@@ -458,28 +463,58 @@ RUNNER_EOF
     whiptail --msgbox "System Crontab sanitized and updated.\nSchedule: $SCHED" 8 60
 }
 
+reset_and_rescan() {
+    if whiptail --title "WARNING" --yesno "This will wipe your current server/channel list and re-download your active matrix from Discord. Your saved backups will NOT be deleted.\n\nProceed?" 10 50; then
+        clear
+        echo ">>> Flushing internal ledger..."
+        rm -f "$ID_MAP"
+        rm -f "$CRON_TARGETS"
+        echo ">>> Ledger flushed. Initiating Active Discovery..."
+        sleep 1
+        "$SCRIPT_DIR/dcordbk" -d
+        echo ">>> Discovery Complete. Press ENTER to return to menu."
+        read
+    fi
+}
+
+execute_adhoc_backup() {
+    clear
+    if [ ! -f "$CRON_TARGETS" ]; then
+        echo ">>> No configuration found. Please 'Configure Backup Options' first."
+        sleep 2
+        return
+    fi
+    echo ">>> Launching Dynamic Backup Matrix based on CURRENT settings..."
+    while IFS='|' read -r ID TYPE NAME BACKUP TEXT MEDIA; do
+        if [[ ! "$ID" =~ ^[0-9]+$ ]]; then continue; fi
+        if [ "$BACKUP" == "1" ]; then
+            local ARGS=()
+            if [ "$TYPE" == "Guild" ]; then ARGS+=("-g" "$ID"); else ARGS+=("-c" "$ID"); fi
+            if [ "$TEXT" == "1" ]; then ARGS+=("--text"); fi
+            if [ "$MEDIA" == "1" ]; then ARGS+=("--media"); fi
+            "$SCRIPT_DIR/dcordbk" "${ARGS[@]}"
+        fi
+    done < "$CRON_TARGETS"
+    echo ">>> Ad-Hoc Backup Complete. Press ENTER to return to menu."
+    read
+}
+
 while true; do
-    CHOICE=$(whiptail --title "Mission Control" --cancel-button "Exit" --menu "Select action (ESC twice to quit):" 15 60 4 \
-        "1" "Configure Backup Options" "2" "Write to Cron" "3" "Run Active Backup Now" "4" "Exit" 3>&1 1>&2 2>&3)
+    CHOICE=$(whiptail --title "Mission Control" --cancel-button "Exit" --menu "Select action (ESC twice to quit):" 16 60 5 \
+        "1" "Configure Backup Options" \
+        "2" "Write to Cron" \
+        "3" "Run Active Backup Now" \
+        "4" "Reset and Rescan Discord" \
+        "5" "Exit" 3>&1 1>&2 2>&3)
     
     if [ $? -ne 0 ]; then clear; exit 0; fi
     
     case $CHOICE in
         1) menu_backup_options ;;
         2) write_to_cron ;;
-        3) 
-           clear
-           if [ -f "$CRON_RUNNER" ]; then 
-               echo ">>> Launching Backup Matrix..."
-               "$CRON_RUNNER"
-               echo ">>> Backup Complete. Press ENTER to return to menu."
-               read
-           else 
-               echo "Please 'Write to Cron' first to generate the runner script."
-               sleep 2
-           fi
-           ;;
-        4|"") clear; exit 0 ;;
+        3) execute_adhoc_backup ;;
+        4) reset_and_rescan ;;
+        5|"") clear; exit 0 ;;
     esac
 done
 EOF
