@@ -1,8 +1,9 @@
 #!/bin/bash
 # ==============================================================================
-# Version: 0.2.11
+# Version: 0.2.13
 # Description: Unified Installer for DCORDBK Archival Suite & Hierarchical UI
 # Target OS: CentOS 9 Stream / RHEL 9
+# Engineered by GuppyGIRL and Hope Lockwood. Maintained by GuppyGIRL and Yui Kirigaya.
 # ==============================================================================
 
 # --- COLORS ---
@@ -19,7 +20,7 @@ IS_SYSTEM="false"
 
 echo -e "${BLUE}"
 echo "========================================================"
-echo "    DCORDBK UNIFIED INSTALLER (v0.2.11)"
+echo "    DCORDBK UNIFIED INSTALLER (v0.2.13)"
 echo "========================================================"
 echo -e "${NC}"
 
@@ -110,7 +111,7 @@ fi
 LEDGER_VERSION="3.0"
 BLUE='\033[0;34m'; NC='\033[0m'
 
-# Internal Log Rotation (Prevents infinite log growth without needing sudo/logrotate)
+# Internal Log Rotation
 if [ "$IS_SYSTEM" == "true" ]; then
     if [ ! -f "/etc/logrotate.d/dcordbk" ]; then
         cat << ROTATE_EOF | sudo tee "/etc/logrotate.d/dcordbk" >/dev/null 2>&1
@@ -121,7 +122,6 @@ $DBK_CRON_LOG {
 ROTATE_EOF
     fi
 else
-    # Native User-Space Log Rotation (5MB Threshold)
     for LOG in "$DBK_EXEC_LOG" "$DBK_CRON_LOG"; do
         if [ -f "$LOG" ]; then
             LOG_SIZE=$(stat -c%s "$LOG" 2>/dev/null || echo 0)
@@ -197,7 +197,7 @@ WORKER="$DBK_SCRIPT_DIR/dbkworker.sh"
 EOF
 
 # ==============================================================================
-# FILE 2: dbkworker.sh (Backend Engine & Post-Processing Harvester)
+# FILE 2: dbkworker.sh (Semantic Backend Engine)
 # ==============================================================================
 cat << 'EOF' > "$TARGET_BIN/dbkworker.sh"
 #!/bin/bash
@@ -220,12 +220,18 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-if [ "$MODE" == "FULL" ]; then DIR_NAME="${DATE}_FULL";
-elif [ "$MODE" == "DMS" ]; then DIR_NAME="${DATE}_DMS";
-else DIR_NAME="${DATE}_SELECTIVE"; fi
+# Semantic Directory Naming
+DIR_NAME="${DATE}_${MODE}"
+if [ "$MODE" == "SELECTIVE" ] && [ ${#ARGS[@]} -gt 0 ]; then
+    FIRST_ID="${ARGS[0]##*:}"
+    # Extract the name from the ledger, replace all non-alphanumeric chars with underscores, collapse multiple underscores
+    TARGET_NAME=$(grep "^$FIRST_ID|" "$DBK_CONF_DIR/id_map.txt" 2>/dev/null | cut -d'|' -f5 | head -n 1 | sed 's/[^a-zA-Z0-9]/_/g' | sed 's/__*/_/g' | sed 's/^_//; s/_$//')
+    if [ -n "$TARGET_NAME" ]; then
+        DIR_NAME="${DATE}_${TARGET_NAME}"
+    fi
+fi
 
 OUT_BASE="$DBK_ARCHIVE_DIR/$DIR_NAME"
-
 EXT=".txt"
 if [ "$FORMAT" == "HtmlDark" ]; then EXT=".html"; fi
 if [ "$FORMAT" == "Json" ]; then EXT=".json"; fi
@@ -244,6 +250,8 @@ elif [ "$MODE" == "SELECTIVE" ]; then
 fi
 
 EXPORT_EXIT=$?
+
+# DM Harvest Ledger Update
 if [ "$MODE" == "DMS" ] && [ -d "$OUT_BASE" ]; then
     for file in "$OUT_BASE"/*; do
         if [ -f "$file" ]; then
@@ -264,13 +272,12 @@ if [ "$MODE" == "DMS" ] && [ -d "$OUT_BASE" ]; then
     fi
 fi
 
+# Multi-Threaded Compression
 if [ $EXPORT_EXIT -eq 0 ] && [ -d "$OUT_BASE" ]; then
     if [ "$IS_INTERACTIVE" = true ]; then 
         echo -e "\n>>> Export complete. Compressing payload (Multi-core enabled)..."
-        # -v on tar outputs file streams to stderr so the user can see progress, -T0 on xz enables multi-threading
         tar -C "$DBK_ARCHIVE_DIR" -cvf - "$DIR_NAME" | xz -9e -T0 > "${OUT_BASE}.tar.xz"
     else 
-        # Silent cron run
         tar -C "$DBK_ARCHIVE_DIR" -cf - "$DIR_NAME" | xz -9e -T0 > "${OUT_BASE}.tar.xz"
     fi
     rm -rf "$OUT_BASE"
@@ -294,17 +301,14 @@ CRON_RUNNER="$SCRIPT_DIR/dbk-cron-runner.sh"
 TOKEN_FILE="$CONF_DIR/.token"
 BLUE='\033[0;34m'; NC='\033[0m'
 
-# --- Token Verification & Auto-Scan Phase ---
 if [ ! -f "$TOKEN_FILE" ] || [ -z "$(cat "$TOKEN_FILE")" ]; then
     NEW_TOKEN=$(whiptail --title "Authentication Required" --inputbox "Welcome to the Discord Archive Suite.\n\nPlease paste your Discord Authorization Token to continue:" 12 65 3>&1 1>&2 2>&3)
     if [ $? -ne 0 ] || [ -z "$NEW_TOKEN" ]; then
         clear; echo "A Discord Token is required to operate this suite. Exiting."; exit 1
     fi
-    # Save the token
     echo "$NEW_TOKEN" > "$TOKEN_FILE"
     chmod 600 "$TOKEN_FILE"
     
-    # Immediately trigger the first-time discovery scan
     clear
     echo -e "${BLUE}========================================================${NC}"
     echo " TOKEN ACCEPTED. INITIATING AUTOMATIC DISCOVERY..."
@@ -542,10 +546,11 @@ RUNNER_EOF
 
 adhoc_wizard() {
     while true; do
-        local TARGET_TYPE=$(whiptail --title "Ad-Hoc Backup Wizard" --cancel-button "Back" --menu "Select what you want to backup right now:" 15 60 3 \
+        local TARGET_TYPE=$(whiptail --title "Ad-Hoc Backup Wizard" --cancel-button "Back" --menu "Select what you want to backup right now:" 16 65 4 \
             "1" "Entire Server (Guild)" \
             "2" "Specific Channel" \
-            "3" "Direct Message" 3>&1 1>&2 2>&3)
+            "3" "Specific Direct Message" \
+            "4" "All Direct Messages (Global Vault)" 3>&1 1>&2 2>&3)
         [ $? -ne 0 ] && return
         [ -z "$TARGET_TYPE" ] && return
         
@@ -588,6 +593,10 @@ adhoc_wizard() {
             [ $? -ne 0 ] && continue
             ARGS+=("-c" "$SELECTED_ID")
             SELECTED_NAME="$(grep "^$SELECTED_ID|" "$ID_MAP" | cut -d'|' -f5)"
+            
+        elif [ "$TARGET_TYPE" == "4" ]; then
+            ARGS+=("-D")
+            SELECTED_NAME="Global DM Vault"
         fi
         
         # Format and Media Selection

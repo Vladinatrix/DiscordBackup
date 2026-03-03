@@ -53,7 +53,7 @@ Now we will install the Discord Archive Suite. This suite relies on two main com
 2. Download our `dcordbk-installer.bash` script. This will also likely save to your Windows Downloads folder.
 3. In your new CentOS terminal, navigate to that folder by typing: `cd /mnt/c/Users/YourUsername/Downloads/`
 4. Run the installer by typing: `bash dcordbk-installer.bash` 
-5. The screen will ask you to choose an installation type. Press 1 for a User Install. This safely creates the necessary folders right in your personal directory.
+5. The screen will ask you to choose an installation type. Press 1 for a User Install. This safely creates the necessary folders right in your personal directory. (Advanced users can run it with `sudo` and select Option 2 for a System Install).
 6. Press y to confirm. The script will handle creating all the directories and setting permissions for you.
 
 ### Phase 5: Setting up DiscordChatExporter
@@ -86,7 +86,7 @@ How to find your Discord Token:
 2. The system will immediately ask for the token you just copied. Paste it in and press Enter. 
 3. The suite will instantly recognize your token, clear the screen, and run an Automatic Discovery. It will reach out to Discord to safely map out all of your Servers and Categories without you having to press another button.
 4. Once the mapping is complete, the `dbkui` Mission Control menu will open.
-5. From here, select "Configure Automated Backups" to choose exactly what you want to save, whether you want plain text or media (images/videos).
+5. From here, select "Configure Automated Backups" to choose exactly what you want to save, whether you want plain text or media (images/videos). DMs and Servers are kept in strict separate lists.
 6. When you are finished configuring, return to the main menu and select "Write to Cron Schedule". This tells your Linux engine exactly when to wake up and run the backups silently in the background!
 
 Welcome to data independence!
