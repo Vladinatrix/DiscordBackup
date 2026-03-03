@@ -1,96 +1,31 @@
-DCORDBK ARCHIVAL SUITE (v0.2.5)
+# DCORDBK ARCHIVAL SUITE (v0.2.10)
 
-DCORDBK is a highly resilient, POSIX-compliant automated archival suite designed to interface with DiscordChatExporter.Cli. It provides a hierarchical, interactive Text User Interface (TUI) to configure, schedule, and manage local backups of Discord Direct Messages, Guilds (Servers), and Categories.
+DCORDBK is a highly resilient, POSIX-compliant automated archival suite designed to interface with `DiscordChatExporter.Cli`. It provides a hierarchical, interactive Text User Interface (TUI) to configure, schedule, and manage local backups of Discord Direct Messages, Guilds (Servers), and Categories.
 
-Engineered with a focus on absolute data retention and portability, it is built to survive network drops, API limitations, and long-term OS migrations without relying on external databases or complex rendering libraries.
+Engineered with a focus on absolute data retention and portability, it is built to survive network drops, API limitations, and long-term OS migrations. **v0.2.10** introduces Strict Local Confinement, meaning all states, logs, and schedules operate entirely in user-space without requiring `sudo` privileges.
 
 ================================================================================
 CORE FEATURES
 ================================================================================
 
-- Interactive TUI (dbkui): A Midnight Commander-style terminal menu built entirely in native whiptail/bash. Configure entire servers, specific categories, or individual channels without touching a command line.
-- Network-Resilient Harvesting: Actively intercepts and parses output filenames on the fly. If the Discord API drops your connection (or you press Ctrl-C), the suite gracefully maps all data acquired prior to the crash before cleaning the staging area.
-- Relational Ledger (v3.0): Dynamically queries the Discord API to build a local, flat-file relational database of your accessible environment (Guild -> Category -> Channel).
-- Automated Cron Management: Translates your UI configuration matrix into a consolidated runner script and safely injects it into your system's crontab alongside native log rotation (/var/log/).
-- Forum Support: Automatically injects thread-inclusion parameters to seamlessly back up Discord "Forum" channels without API errors.
-- Maximum Compression: Archives are piped directly into tar and xz (Level 9) for an incredibly small, text-only storage footprint.
+- **Interactive TUI (dbkui):** A Midnight Commander-style terminal menu built entirely in native `whiptail`/`bash`. Configure entire servers, specific categories, or individual channels without touching a command line.
+- **Dynamic Cron Pre-Sync:** Never manually update your server rules again. When executing scheduled backups, the suite silently queries Discord *first* to map any newly created channels, mathematically guaranteeing your "Entire Server" backups never miss a newly added chat room.
+- **Strict Local Confinement:** Every execution log, cron log, token, and ledger map is strictly contained within your hidden `.conf/` directory. The suite features native 5MB log-rotation, keeping your system perfectly clean without touching `/var/log` or requiring root permissions.
+- **Secure Token Ingestion:** Native, user-permission-locked (`chmod 600`) handling of your Discord Authorization Token to ensure zero-friction startups and seamless API bridging. 
+- **Semantic File Naming:** Archive files are strictly formatted into human-readable outputs (`Server Name - Channel Name.html`), allowing you to navigate your archives without needing to decipher raw Discord IDs. 
+- **Decoupled Ad-Hoc Runner:** Execute instant, on-demand backups directly from the UI without overriding or interfering with your automated `cron` schedules.
 
 ================================================================================
-EXTERNAL DEPENDENCIES & PREREQUISITES
+QUICK START & USAGE
 ================================================================================
 
-To function, this suite orchestrates a specific stack of external binaries and standard Linux utilities. 
+1. Run the installer: `bash dcordbk-installer.bash` (Choose Option 1 for a User Install)
+2. Launch Mission Control: Type `dbkui` in your terminal.
+3. Paste your Discord Token when prompted. The suite will immediately and automatically map your accessible servers.
+4. Select your backup targets and output formats (HTML, JSON, or Plain Text).
+5. Select `Write to Cron Schedule` to establish your automated backup bridge. 
 
-1. DiscordChatExporter.Cli (The Extraction Engine)
-   This is a third-party, open-source C# application created and maintained by Tyrrrz (Alexey Golub). It is responsible for all direct communication with the Discord API.
-   - Source: https://github.com/Tyrrrz/DiscordChatExporter
-   - Requirements: Requires the .NET Runtime (v8.0+) to be installed on the host system, unless the "self-contained" Linux binary is downloaded from the repository's Releases page.
-   - Path Expected: /usr/local/bin/DiscordChatExporter.Cli (Can be modified via the interactive installer or manually patched).
-
-2. Whiptail (The UI Engine)
-   The ncurses/newt visual rendering engine used to draw the configuration matrix.
-   - RHEL/CentOS: sudo dnf install newt
-   - Debian/Ubuntu: sudo apt install whiptail
-
-3. GNU/POSIX System Binaries
-   The suite relies on the following native system utilities for text processing, scheduling, and file management:
-   - Data Processing: awk, grep, sed, sort, cut, tr, head
-   - Compression: tar, xz
-   - File System: cat, mkdir, rm, mv, touch, mktemp, basename, dirname, readlink
-   - Scheduling & Privileges: sudo, crontab, chown, chmod, whoami, id
-   - Utilities: date, sleep, clear
-
-================================================================================
-INSTALLATION
-================================================================================
-
-1. Make the installer executable:
-   chmod +x installdbk.bash
-
-2. Run the installer:
-   ./installdbk.bash
-
-Deployment Targets:
-The interactive installer will prompt you for a deployment path:
-- User Install (Recommended): Deploys binaries to ~/bin and archives to ~/Discord_Archive.
-- System Install: Deploys globally to /usr/local/bin and /usr/local/discord_archive (Requires sudo).
-- Custom: Allows arbitrary pathing (Must use absolute paths).
-
-================================================================================
-USAGE (THE INTERFACE)
-================================================================================
-
-The primary method of interaction is the Mission Control TUI.
-
-Simply run: dbkui
-
-The Mission Control Menu:
-1. Configure Backup Options: Navigate your mapped Discord environment. Select DMs, Entire Servers, or drill down into specific Categories to explicitly toggle Backup (Y/N), Text (Y/N), and Media (Y/N) configurations.
-2. Write to Cron: Compiles your saved configuration matrix into an execution runner and schedules it (Daily, Weekly, or Monthly) into the system crontab.
-3. Run Active Backup Now: Immediately executes the compiled configuration matrix in the foreground, streaming the native Spectre.Console progress bars to your terminal.
-
-================================================================================
-ADVANCED / CLI USAGE (dcordbk)
-================================================================================
-
-While dbkui handles configuration, the underlying master wrapper (dcordbk) can be invoked manually for immediate, one-off tasks outside the scheduled matrix.
-
-Usage: dcordbk [TARGET] [OPTIONS]
-
-TARGETS:
-  -A, --all            Backup EVERYTHING (All Servers + DMs)
-  -D, --dms            Backup DMs only
-  -c <ID>              Backup specific Channel ID
-  -g <ID>              Backup specific Guild ID
-
-UTILITY:
-  -d, --discover       Force an API query to rebuild the local ID ledger.
-  -l, --list           List all mapped IDs from the local ledger.
-
-The "Invisible DM" Limitation:
-The Discord API strictly prohibits active polling of Direct Messages without an associated Server ID. Consequently, DMs do not automatically appear in the ledger. 
-
-To populate the DM matrix in dbkui, you must run a "Primer Harvest". The TUI will automatically detect if your DM ledger is empty and offer to run a quick background sync to capture your contact list.
+*Note: Discord limits token access to Direct Messages unless manually initialized. To populate the DM matrix in `dbkui`, select the Direct Messages menu to trigger a one-time "Primer Harvest".*
 
 ================================================================================
 ARCHITECTURE & FILE STRUCTURE
@@ -98,17 +33,19 @@ ARCHITECTURE & FILE STRUCTURE
 
 The suite is entirely self-contained within your chosen installation target.
 
-- bin/dcordbk: The Master Wrapper. Handles API polling, log rotation escalation, and execution dispatch.
-- bin/dbkworker.sh: The Heavy Lifter. Executes the C# binary, harvests network-resilient telemetry, and handles tar.xz compression.
-- bin/dbkui: The State Machine. Renders the interactive configuration matrix and handles deduplication logic.
-- bin/dbk-cron-runner.sh: (Auto-Generated). The bridge script read by crontab to execute your configured matrix.
-- Archive/.conf/id_map.txt: The v3.0 Relational Ledger. A flat-file mapping of your Discord hierarchy.
-- Archive/.conf/cron_targets.txt: Your saved configuration matrix database. 
+- `bin/dcordbk`: The Master Wrapper. Handles API polling, rootless log rotation, and execution dispatch.
+- `bin/dbkworker.sh`: The Heavy Lifter. Executes the core C# binary, applies Semantic Naming templates, and handles `tar.xz` compression.
+- `bin/dbkui`: The State Machine. Renders the interactive configuration matrix, token ingestion, and the isolated Ad-Hoc wizard.
+- `Archive/.conf/dbk-cron-runner.sh`: (Auto-Generated). The bridge script read by `crontab` to execute the pre-sync and backup matrix.
+- `Archive/.conf/id_map.txt`: The v3.0 Relational Ledger. A flat-file mapping of your Discord hierarchy.
+- `Archive/.conf/cron_targets.txt`: Your saved configuration matrix database. 
+- `Archive/.conf/.token`: Secure storage for your API bridge.
+- `Archive/.conf/.tmp/`: A secure, temporary sandbox used during API parsing to prevent multi-user system snooping.
 
-Log Files:
-Execution logs are safely rotated monthly via /etc/logrotate.d/dcordbk and stored at:
-- /var/log/dbk_monthly.log
-- /var/log/dbk_weekly.log
+**Execution Logs:**
+Execution and automated scheduling logs are securely maintained at:
+- `Archive/.conf/dbk_execution.log`
+- `Archive/.conf/dbk_cron.log`
 
 --------------------------------------------------------------------------------
-Engineered by Hope Lockwood. Maintained by Yui Kirigaya.
+Engineered by GuppyGIRL, Hope Lockwood. Maintained by GuppyGIRL, Yui Kirigaya.
