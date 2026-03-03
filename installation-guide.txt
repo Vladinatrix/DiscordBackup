@@ -1,4 +1,4 @@
-# Advice for the layman
+# Advice for the layman (v0.2.13 - March 3, 2026 at 08:54 AM CST)
 
 Welcome! If you are looking to back up your Discord servers and direct messages but have never touched a Linux terminal before, you are in the right place. We are going to take this one step at a time. 
 
@@ -92,4 +92,5 @@ How to find your Discord Token:
 Welcome to data independence!
 
 --------------------------------------------------------------------------------
+Version: v0.2.13 | Released: March 3, 2026 at 08:54 AM CST
 Engineered by GuppyGIRL and Hope Lockwood. Maintained by GuppyGIRL and Yui Kirigaya.

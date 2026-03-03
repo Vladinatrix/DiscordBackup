@@ -1,4 +1,4 @@
-# DCORDBK ARCHIVAL SUITE (v0.2.13)
+# DCORDBK ARCHIVAL SUITE (v0.2.13 - March 3, 2026 at 08:54 AM CST)
 
 DCORDBK is a highly resilient, POSIX-compliant automated archival suite designed to interface with `DiscordChatExporter.Cli`. It provides a hierarchical, interactive Text User Interface (TUI) to configure, schedule, and manage local backups of Discord Direct Messages, Guilds (Servers), and Categories.
 
@@ -50,4 +50,5 @@ Execution and automated scheduling logs are securely maintained at:
 - `Archive/.conf/dbk_cron.log`
 
 --------------------------------------------------------------------------------
+Version: v0.2.13 | Released: March 3, 2026 at 08:54 AM CST
 Engineered by GuppyGIRL and Hope Lockwood. Maintained by GuppyGIRL and Yui Kirigaya.

@@ -1,4 +1,4 @@
-# How to use the backups you make
+# How to use the backups you make (v0.2.13 - March 3, 2026 at 08:54 AM CST)
 
 Welcome! You have successfully set up the Discord Archive Suite (currently on version 0.2.13) and your computer is silently saving your history. But what exactly is it saving, and how do you look at it? 
 
@@ -32,4 +32,5 @@ When you extract your beautifully named backup archive, you might notice that th
 Why do we do this? Discord allows users to put almost anything in their channel names—including emojis, crazy symbols, and strange spacing. If we tried to name a Linux folder using a dancing parrot emoji, the computer's file system would completely crash! By using Discord's unique numeric IDs internally, we guarantee your backups will never fail due to a weird character.
 
 --------------------------------------------------------------------------------
+Version: v0.2.13 | Released: March 3, 2026 at 08:54 AM CST
 Engineered by GuppyGIRL and Hope Lockwood. Maintained by GuppyGIRL and Yui Kirigaya. 
