@@ -1,6 +1,6 @@
 # How to use the backups you make
 
-Welcome! You have successfully set up the Discord Archive Suite (currently on version 0.2.10) and your computer is silently saving your history. But what exactly is it saving, and how do you look at it? 
+Welcome! You have successfully set up the Discord Archive Suite (currently on version 0.2.11) and your computer is silently saving your history. But what exactly is it saving, and how do you look at it? 
 
 ### 1. The Golden Rule: We are building a Museum, not a Time Machine
 The most common question we get is: *"How do I restore these messages back into Discord?"*
@@ -29,7 +29,7 @@ When you extract your backups, you might notice that the system relies heavily o
 
 Why do we do this? Discord allows users to put almost anything in their server names—including emojis, crazy symbols, and strange spacing. If we tried to name a Linux folder using a dancing parrot emoji, the computer's file system would completely crash! By using Discord's unique numeric IDs, we guarantee your backups will never fail due to a weird character.
 
-**Please note:** This is an early release of the software (v0.2.10). We understand that reading ID numbers is not user-friendly. In future updates, we will be transitioning to more human-readable folder layouts as we build safer ways to translate emojis into standard text.
+**Please note:** This is an early release of the software (v0.2.11). We understand that reading ID numbers is not user-friendly. In future updates, we will be transitioning to more human-readable folder layouts as we build safer ways to translate emojis into standard text.
 
 --------------------------------------------------------------------------------
-Engineered by GuppyGIRL, and Hope Lockwood. Maintained by GuppyGIRL, and Yui Kirigaya.
+Engineered by GuppyGIRL and Hope Lockwood. Maintained by GuppyGIRL and Yui Kirigaya. 

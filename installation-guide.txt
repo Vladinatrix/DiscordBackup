@@ -90,3 +90,6 @@ How to find your Discord Token:
 6. When you are finished configuring, return to the main menu and select "Write to Cron Schedule". This tells your Linux engine exactly when to wake up and run the backups silently in the background!
 
 Welcome to data independence!
+
+--------------------------------------------------------------------------------
+Engineered by GuppyGIRL and Hope Lockwood. Maintained by GuppyGIRL and Yui Kirigaya.

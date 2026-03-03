@@ -1,0 +1,87 @@
+# Advice for the layman: The Virtual Machine Guide
+
+Welcome! If you are using a Mac, or if you are on Windows but prefer to use a full "Virtual Machine" instead of WSL, this guide is for you. 
+
+A Virtual Machine (VM) is a fake, software-based computer running inside your real computer. It acts like a completely separate machine. By using a "pre-built" image, we can skip the complicated Linux installation entirely and get you running in minutes.
+
+### Phase 1: Choose Your Sandbox (The Hypervisor)
+
+To run a virtual machine, you need a program called a "hypervisor." Choose the one that fits your computer, download it, and install it like a normal app:
+
+* **If you want to use VMware Player (Windows/Linux):** See the **VMware Instructions** in Phase 3.
+* **If you want to use Oracle VirtualBox (Windows/Older Intel Macs):** See the **VirtualBox Instructions** in Phase 3.
+* **If you want to use UTM (Newer M1/M2/M3 Macs):** See the **UTM Instructions** in Phase 3.
+* **If you are an advanced user who wants to build Linux from scratch:** See the **Advanced Appendix** at the bottom of this page.
+
+### Phase 2: Download the Linux Brain (Pre-built Image)
+
+Instead of building Linux from scratch, we are going to download a computer that is already set up and compressed into a single file. 
+
+1. Open your web browser and go to a trusted community image site like **LinuxVMImages.com** or **OSBoxes.org**. 
+2. Search for either **CentOS 9 Stream** or **CentOS 10 Stream**. Our backup software works perfectly on both!
+3. **Important:** Download the file type that matches your hypervisor. 
+   * If using VirtualBox, download the **VirtualBox Image** (usually ends in `.vdi` or `.ova`).
+   * If using VMware, download the **VMware Image** (usually ends in `.vmdk` or `.ova`).
+   * If using UTM on a Mac, you can generally use the `.ova` or `.qcow2` format.
+
+### Phase 3: Waking Up Your Machine
+
+Now we will load that pre-built brain into your hypervisor.
+
+**For VMware:**
+1. Open VMware Workstation Player.
+2. Click **Open a Virtual Machine**. 
+3. Find the `.ova` or `.vmdk` file you just downloaded and select it.
+4. Give your new machine a name (like "Discord Archive") and click **Import**. 
+5. Once it finishes, click **Play Virtual Machine**. 
+
+**For VirtualBox:**
+1. Open Oracle VirtualBox.
+2. Go to **File** -> **Import Appliance**. 
+3. Select the `.ova` file you downloaded and click **Next**, then **Finish**.
+4. Once it appears in your list on the left, click it and press the green **Start** arrow.
+
+**For UTM (Mac):**
+1. Open UTM.
+2. Click the **+** button to create a new VM. 
+3. Click **Virtualize**, then select **Linux**.
+4. Uncheck "Use Apple Virtualization" and click **Browse** to select your downloaded image file.
+5. Follow the prompts to give it 4GB of Memory (RAM) and finish the setup. Press the play button to turn it on!
+
+*(Note: The website you downloaded the image from will provide the default username and password. It is usually something simple like `centos` for both the username and password!)*
+
+### Phase 4: Bridging the Worlds (Getting files in and out)
+
+Your Linux machine is locked in a secure box. To get our installer script inside, we need to map a shared folder between your real computer and the fake one. 
+
+**If you are on Windows (VMware / VirtualBox):**
+1. In your hypervisor's top menu bar, look for **Virtual Machine Settings**.
+2. Find the tab labeled **Options** or **Shared Folders**.
+3. Turn it "On" and add your Windows **Downloads** folder.
+4. Inside your Linux terminal, this folder will now magically appear at `/mnt/hgfs/` (VMware) or `/media/sf_Downloads/` (VirtualBox).
+
+**If you are on a Mac (UTM / VirtualBox):**
+1. **UTM:** While the VM is running, look at the top toolbar of the UTM window. Click the folder icon (Shared Directory) and select your Mac's **Downloads** folder. Inside Linux, you will find these files by navigating to the `/media/` or `/run/media/` directory.
+2. **Alternative Mac Method (Drag and Drop):** If shared folders are fighting you, the easiest layman method is often built right in! In both VirtualBox and UTM, you can usually click on the `dcordbk-installer.bash` file on your Mac desktop, and simply **drag and drop** it right into the Linux virtual machine window. 
+
+### Phase 5: Onward to Backup!
+
+Your engine is built, fueled, and running. 
+
+You are now ready to install the Discord Archive Suite. Please return to the main **"Advice for the layman"** guide and begin at **Phase 4: Installing the Backup Software**. When that guide tells you to run the installer, just make sure you navigate to your new Shared Folder first!
+
+---
+
+### Appendix: For Advanced Users (Installing from ISO)
+
+If you do not want to use a pre-built community image and prefer to partition and install the OS manually, follow these steps:
+
+1. Download the official **DVD ISO** for CentOS 9 Stream or CentOS 10 Stream from `centos.org/download/`.
+2. Open your hypervisor and choose **Create a New Virtual Machine** (do not use "Import").
+3. Point the virtual CD-ROM drive to your downloaded ISO file.
+4. Allocate at least 2GB of RAM (4GB recommended) and a 20GB dynamically expanding virtual hard disk.
+5. Boot the VM and follow the CentOS Anaconda installer. Ensure you set a root password, create a user with administrative privileges, and accept the default automatic storage partitioning.
+6. Once rebooted, proceed to Phase 4 above to configure your shared folders.
+
+--------------------------------------------------------------------------------
+Engineered by GuppyGIRL and Hope Lockwood. Maintained by GuppyGIRL and Yui Kirigaya.

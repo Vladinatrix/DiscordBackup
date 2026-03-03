@@ -1,14 +1,16 @@
-# DCORDBK ARCHIVAL SUITE (v0.2.10)
+# DCORDBK ARCHIVAL SUITE (v0.2.11)
 
 DCORDBK is a highly resilient, POSIX-compliant automated archival suite designed to interface with `DiscordChatExporter.Cli`. It provides a hierarchical, interactive Text User Interface (TUI) to configure, schedule, and manage local backups of Discord Direct Messages, Guilds (Servers), and Categories.
 
-Engineered with a focus on absolute data retention and portability, it is built to survive network drops, API limitations, and long-term OS migrations. **v0.2.10** introduces Strict Local Confinement, meaning all states, logs, and schedules operate entirely in user-space without requiring `sudo` privileges.
+Engineered with a focus on absolute data retention and portability, it is built to survive network drops, API limitations, and long-term OS migrations. **v0.2.11** introduces Strict Local Confinement, meaning all states, logs, and schedules operate entirely in user-space without requiring `sudo` privileges, alongside a multi-threaded compression engine.
 
 ================================================================================
 CORE FEATURES
 ================================================================================
 
 - **Interactive TUI (dbkui):** A Midnight Commander-style terminal menu built entirely in native `whiptail`/`bash`. Configure entire servers, specific categories, or individual channels without touching a command line.
+- **Multi-Threaded Compression:** Unleashes the full power of your CPU (`xz -T0`) to drastically reduce archive generation times for large servers with heavy media payloads.
+- **Verbose Progress Tracking:** No more frozen screens. The UI actively streams tarball generation progress so you know exactly which file is being ingested.
 - **Dynamic Cron Pre-Sync:** Never manually update your server rules again. When executing scheduled backups, the suite silently queries Discord *first* to map any newly created channels, mathematically guaranteeing your "Entire Server" backups never miss a newly added chat room.
 - **Strict Local Confinement:** Every execution log, cron log, token, and ledger map is strictly contained within your hidden `.conf/` directory. The suite features native 5MB log-rotation, keeping your system perfectly clean without touching `/var/log` or requiring root permissions.
 - **Secure Token Ingestion:** Native, user-permission-locked (`chmod 600`) handling of your Discord Authorization Token to ensure zero-friction startups and seamless API bridging. 
@@ -48,4 +50,4 @@ Execution and automated scheduling logs are securely maintained at:
 - `Archive/.conf/dbk_cron.log`
 
 --------------------------------------------------------------------------------
-Engineered by GuppyGIRL, Hope Lockwood. Maintained by GuppyGIRL, Yui Kirigaya.
+Engineered by GuppyGIRL and Hope Lockwood. Maintained by GuppyGIRL and Yui Kirigaya.
