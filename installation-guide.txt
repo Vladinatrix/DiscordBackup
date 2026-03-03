@@ -1,0 +1,116 @@
+Advice for the layman
+Welcome! If you are looking to back up your Discord servers and direct messages but have never touched a Linux terminal before, you are in the right place. We are going to take this one step at a time.
+
+Phase 1: The Engine You Need (Platform Agnostic)
+This backup suite is not just for Windows. You can run this software anywhere: on Windows, a Mac, a Cloud virtual machine, or a native dedicated server.
+
+The only requirement is that your engine must be running a flavor of Linux based on Red Hat Enterprise Linux (RHEL). Our software speaks their language perfectly. You can use any of the following RHEL-family operating systems:
+
+Red Hat Enterprise Linux (RHEL)
+
+CentOS and CentOS Stream
+
+Rocky Linux
+
+AlmaLinux
+
+Oracle Linux
+
+EuroLinux
+
+Amazon Linux (if you are running in the AWS Cloud)
+
+If you are running on a Mac, in the Cloud, or on a native server, you will simply set up one of the operating systems above and skip straight to Phase 3.
+
+(Note: If you are using a Mac or want to use full virtual machines on Windows like VMware Player or VirtualBox, please see our dedicated Virtual Machine Setup Guide. We have step-by-step instructions for those platforms there!)
+
+If you are on a standard Windows computer, the easiest way to run this is using the built-in Windows Subsystem for Linux (WSL). Let's set that up now.
+
+Phase 2: Setting up your Linux Engine on Windows (WSL)
+Windows has a built-in feature called WSL. Think of it as a secure, virtual sandbox that lets you run Linux software right on your Windows desktop.
+
+Enable WSL: Click your Windows Start menu, type PowerShell, right-click the PowerShell icon, and select Run as Administrator.
+
+Type this exact command into the blue window and press Enter: wsl --install
+
+Restart your computer when it finishes.
+
+Get the Official CentOS Image: We need a specific flavor of Linux called CentOS. You can use either CentOS 9 Stream or CentOS 10 Stream; our software is built to work flawlessly on both.
+
+Open your web browser and go to the official CentOS directories:
+
+For CentOS 9 Stream: https://mirror.stream.centos.org/SIGs/9-stream/altimages/images/wsl/
+
+For CentOS 10 Stream: https://mirror.stream.centos.org/SIGs/10-stream/altimages/images/wsl/
+
+CRITICAL STEP: When you click the link, look for the file that ends in .wsl. Do not download the .tar file! Download the .wsl file.
+
+Install the Image: Open PowerShell as Administrator again and "import" your new Linux brain by typing:
+wsl --install --from-file C:\Users\YourUsername\Downloads\<name_of_the_file_you_downloaded>.wsl --name CentOS
+(Hint: Because you downloaded it from your web browser, the .wsl file is almost certainly sitting right in your standard Windows Downloads folder!)
+
+Start your new environment by typing: wsl -d CentOS
+
+Phase 3: Connecting the Worlds
+Right now, you are inside Linux. But how do you access your normal Windows files?
+Linux sees your Windows C:\ drive a little differently. If you ever need to access your Windows Downloads folder from inside Linux, you will look for it here: /mnt/c/Users/YourUsername/Downloads/. We need to know this so we can easily move files between the two worlds.
+
+Phase 4: Installing the Backup Software
+Now we will install the Discord Archive Suite. This suite relies on two main components: our management tool, and the core exporting engine.
+
+First, visit our official repository: https://github.com/Vladinatrix/DiscordBackup
+
+Download our dcordbk-installer.bash script. This will also likely save to your Windows Downloads folder.
+
+In your new CentOS terminal, navigate to that folder by typing: cd /mnt/c/Users/YourUsername/Downloads/
+
+Run the installer by typing: bash dcordbk-installer.bash
+
+The screen will ask you to choose an installation type. Press 1 for a User Install. This safely creates the necessary folders right in your personal directory.
+
+Press y to confirm. The script will handle creating all the directories and setting permissions for you.
+
+Phase 5: Setting up DiscordChatExporter
+Under the hood, our tool relies on an excellent program called DiscordChatExporter to actually read and save the messages.
+
+Visit the dependency repository here: https://github.com/Tyrrrz/DiscordChatExporter
+
+Follow the instructions on their page to download the Linux release.
+
+Extract those files into the bin folder that our installer created in Phase 4. This links the powerful exporter engine to our easy-to-use automatic schedule.
+
+Phase 6: Configuration and Finding Your Token
+The software is installed! Now we have to tell it what to back up. To do this, you need your Discord Token.
+
+Why do we need a token? Your token is a secret string of text that acts as a digital ID card. It proves to Discord that it is actually you requesting to read and save your own messages. (Note: Never share this token with anyone!)
+
+How to find your Discord Token:
+
+Open Discord in your web browser (like Chrome or Firefox) and log in.
+
+Press F12 on your keyboard to open the Developer Tools panel.
+
+Click on the Network tab at the top of this new panel.
+
+While the Network tab is open, click between a few different channels in Discord. You will see a lot of text start scrolling in the panel.
+
+In the "Filter" box inside the Network tab, type messages.
+
+Click on any of the items that appear in the list.
+
+Scroll down to the Request Headers section and look for a line labeled Authorization.
+
+The long string of letters and numbers next to Authorization is your Token. Copy it!
+
+Phase 7: Mission Control
+Go back to your CentOS terminal and type dbkui to begin.
+
+The dbkui is your Mission Control menu.
+
+It will ask for the token you just copied. Paste it in.
+
+The system will run an Active Discovery, reaching out to Discord to safely map out all of your Servers and Direct Messages.
+
+Once complete, use the menu to select exactly what you want to back up, whether you want plain text or media (images/videos), and how often you want it to run automatically in the background.
+
+Welcome to data independence!
