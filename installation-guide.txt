@@ -1,96 +1,126 @@
-# Advice for the layman (v0.2.13 - March 3, 2026 at 08:54 AM CST)
+ADVICE FOR THE LAYMAN (v1.3.2)
 
-Welcome! If you are looking to back up your Discord servers and direct messages but have never touched a Linux terminal before, you are in the right place. We are going to take this one step at a time. 
+Welcome! If you are looking to back up your Discord servers and direct messages but have never touched a Linux terminal before, you are in the right place. We are going to take this one step at a time.
 
 By the end of this guide, you will have a miniature Linux computer running silently inside your Windows computer, automatically saving your Discord history.
 
-### Phase 1: The Engine You Need (Platform Agnostic)
+Phase 1: The Engine You Need (Platform Agnostic)
 
-This backup suite is not just for Windows. You can run this software anywhere: on Windows, a Mac, a Cloud virtual machine, or a native dedicated server. 
+This backup suite is not just for Windows. You can run this software anywhere: on Windows, a Mac, a Cloud virtual machine, or a native dedicated server.
 
-The only requirement is that your engine must be running a flavor of Linux based on Red Hat Enterprise Linux (RHEL). Our software speaks their language perfectly. You can use any of the following RHEL-family operating systems: 
-* Red Hat Enterprise Linux (RHEL)
-* CentOS and CentOS Stream
-* Rocky Linux
-* AlmaLinux
-* Oracle Linux
-* EuroLinux
-* Amazon Linux (if you are running in the AWS Cloud)
+The only requirement is that your engine must be running a flavor of Linux based on Red Hat Enterprise Linux (RHEL). Our software speaks their language perfectly. You can use any of the following RHEL-family operating systems:
 
-If you are running on a Mac, in the Cloud, or on a native server, you will simply set up one of the operating systems above and skip straight to Phase 3. 
+Red Hat Enterprise Linux (RHEL)
 
-*(Note: If you are using a Mac or want to use full virtual machines on Windows like VMware Player or VirtualBox, please see our dedicated Virtual Machine Setup Guide. We have step-by-step instructions for those platforms there!)*
+CentOS Stream (CentOS 9 Stream or CentOS 10 Stream)
+
+Rocky Linux
+
+AlmaLinux
+
+Oracle Linux
+
+EuroLinux
+
+Amazon Linux (if you are running in the AWS Cloud)
+
+If you are running on a Mac, in the Cloud, or on a native server, you will simply set up one of the operating systems above and skip straight to Phase 3.
+
+(Note: If you are using a Mac or want to use full virtual machines on Windows like VMware Player or VirtualBox, please see our dedicated Virtual Machine Setup Guide.)
 
 If you are on a standard Windows computer, the easiest way to run this is using the built-in Windows Subsystem for Linux (WSL). Let's set that up now.
 
-### Phase 2: Setting up your Linux Engine on Windows (WSL)
+Phase 2: Setting up your Linux Engine on Windows (WSL)
 
-Windows has a built-in feature called WSL. Think of it as a secure, virtual sandbox that lets you run Linux software right on your Windows desktop. 
+Windows has a built-in feature called WSL. Think of it as a secure, virtual sandbox that lets you run Linux software right on your Windows desktop.
 
-1. Enable WSL: Click your Windows Start menu, type `PowerShell`, right-click the PowerShell icon, and select Run as Administrator. 
-2. Type this exact command into the blue window and press Enter: `wsl --install`
-3. Restart your computer when it finishes.
-4. Get the Official CentOS Image: We need a specific flavor of Linux called CentOS. You can use either CentOS 9 Stream or CentOS 10 Stream; our software is built to work flawlessly on both. 
-   * Open your web browser and go to the official CentOS directories:
-     * For CentOS 9 Stream: `https://mirror.stream.centos.org/SIGs/9-stream/altimages/images/wsl/`
-     * For CentOS 10 Stream: `https://mirror.stream.centos.org/SIGs/10-stream/altimages/images/wsl/`
-   * CRITICAL STEP: When you click the link, look for the file that ends in `.wsl`. Do not download the `.tar` file! Download the `.wsl` file.
-5. Install the Image: Open PowerShell as Administrator again and "import" your new Linux brain by typing: 
-   `wsl --install --from-file C:\Users\YourUsername\Downloads\<name_of_the_file_you_downloaded>.wsl --name CentOS`
-   *(Hint: Because you downloaded it from your web browser, the `.wsl` file is almost certainly sitting right in your standard Windows Downloads folder!)*
-6. Start your new environment by typing: `wsl -d CentOS`
+Enable WSL: Click your Windows Start menu, type PowerShell, right-click the PowerShell icon, and select Run as Administrator.
 
-### Phase 3: Connecting the Worlds
+Type this exact command into the window and press Enter: wsl --install
 
-Right now, you are inside Linux. But how do you access your normal Windows files? 
-Linux sees your Windows `C:\` drive a little differently. If you ever need to access your Windows Downloads folder from inside Linux, you will look for it here: `/mnt/c/Users/YourUsername/Downloads/`. We need to know this so we can easily move files between the two worlds.
+Restart your computer when it finishes.
 
-### Phase 4: Installing the Backup Software
+Get an Official RHEL-family Image (e.g., CentOS Stream or Rocky Linux):
 
-Now we will install the Discord Archive Suite. This suite relies on two main components: our management tool, and the core exporting engine.
+Open your web browser and navigate to the official distribution download directory.
 
-1. First, visit our official repository: https://github.com/Vladinatrix/DiscordBackup
-2. Download our `dcordbk-installer.bash` script. This will also likely save to your Windows Downloads folder.
-3. In your new CentOS terminal, navigate to that folder by typing: `cd /mnt/c/Users/YourUsername/Downloads/`
-4. Run the installer by typing: `bash dcordbk-installer.bash` 
-5. The screen will ask you to choose an installation type. Press 1 for a User Install. This safely creates the necessary folders right in your personal directory. (Advanced users can run it with `sudo` and select Option 2 for a System Install).
-6. Press y to confirm. The script will handle creating all the directories and setting permissions for you.
+CRITICAL STEP: Download the file that ends in .wsl (do not download the .tar file).
 
-### Phase 5: Setting up DiscordChatExporter
+Install the Image: Open PowerShell as Administrator again and import your new Linux brain by typing:
+wsl --install --from-file C:\Users<Username>\Downloads<filename>.wsl --name 
+(Note: Replace , , and  with your actual Windows username, downloaded file name, and preferred distribution name).
 
-Under the hood, our tool relies on an excellent program called DiscordChatExporter to actually read and save the messages. 
+Start your new environment by typing: wsl -d
 
-1. Visit the dependency repository here: https://github.com/Tyrrrz/DiscordChatExporter
-2. Follow the instructions on their page to download the Linux release.
-3. Extract those files into the `bin` folder that our installer created in Phase 4. This links the powerful exporter engine to our easy-to-use automatic schedule.
+Phase 3: Connecting the Worlds   
 
-### Phase 6: Finding Your Token
+Right now, you are inside Linux. But how do you access your normal Windows files?
+Linux sees your Windows C:\ drive a little differently. If you ever need to access your Windows Downloads folder from inside Linux, you will look for it here: /mnt/c/Users//Downloads/. We need to know this so we can easily move files between the two worlds.   
 
-The software is installed! Now we have to tell it what to back up. To do this, you need your Discord Token. 
+Phase 4: Installing the Backup Software   
 
-Why do we need a token? Your token is a secret string of text that acts as a digital ID card. It proves to Discord that it is actually you requesting to read and save your own messages. (Note: Never share this token with anyone!)
+Now we will install the Discord Archive Suite (v1.3.2).   
 
-How to find your Discord Token:
-1. Open Discord in your web browser (like Chrome or Firefox) and log in.
-2. Press F12 on your keyboard to open the Developer Tools panel. 
-3. Click on the Network tab at the top of this new panel.
-4. While the Network tab is open, click between a few different channels in Discord. You will see a lot of text start scrolling in the panel.
-5. In the "Filter" box inside the Network tab, type: messages
-6. Click on any of the items that appear in the list.
-7. Scroll down to the Request Headers section and look for a line labeled Authorization.
-8. The long string of letters and numbers next to Authorization is your Token. Copy it!
+Download the dcordbk-installer.bash script from the repository into your Windows Downloads folder.   
 
-### Phase 7: Mission Control
+In your Linux terminal, navigate to that folder by typing: cd /mnt/c/Users//Downloads/   
 
-1. Go back to your CentOS terminal and type `dbkui` to begin.
-2. The system will immediately ask for the token you just copied. Paste it in and press Enter. 
-3. The suite will instantly recognize your token, clear the screen, and run an Automatic Discovery. It will reach out to Discord to safely map out all of your Servers and Categories without you having to press another button.
-4. Once the mapping is complete, the `dbkui` Mission Control menu will open.
-5. From here, select "Configure Automated Backups" to choose exactly what you want to save, whether you want plain text or media (images/videos). DMs and Servers are kept in strict separate lists.
-6. When you are finished configuring, return to the main menu and select "Write to Cron Schedule". This tells your Linux engine exactly when to wake up and run the backups silently in the background!
+Run the installer by typing: bash dcordbk-installer.bash   
+
+Choose your installation type:   
+
+Select Option 1 for a User Install (installs locally in your home directory).   
+
+Select Option 2 for a System Install (installs system-wide to /usr/local/bin via sudo).   
+
+Confirm the prompts. The installer will automatically deploy the management interface (dbkui), the backend worker engine (dbkworker.sh), and the internal Python export engine (DiscordChatExporter.Cli). No external manual file extraction is required.   
+
+Phase 5: Finding Your Discord Token   
+
+The software is installed! Now we have to tell it what account to back up. To do this, you need your Discord Token.   
+
+Why do we need a token? Your token is a secret string of text that acts as a digital ID card. It proves to Discord that it is actually you requesting to read and save your own messages. (Note: Never share this token with anyone!)   
+
+How to find your Discord Token:   
+
+Open Discord in your web browser (like Chrome or Firefox) and log in.   
+
+Press F12 on your keyboard to open the Developer Tools panel.   
+
+Click on the Network tab at the top of this panel.   
+
+While the Network tab is open, click between a few different channels in Discord. You will see text start scrolling in the panel.   
+
+In the Filter box inside the Network tab, type: messages
+
+Click on any of the items that appear in the list.
+
+Scroll down to the Request Headers section and look for a line labeled Authorization.
+
+The long string of letters and numbers next to Authorization is your Token. Copy it!
+
+Phase 6: Mission Control & Automated Scheduling
+
+In your Linux terminal, type dbkui to launch Mission Control.
+
+Paste your Discord Token when prompted and press Enter.
+
+The suite will recognize your token and trigger an Automatic Discovery, querying Discord to map all accessible Servers, Categories, Channels, and Direct Messages into a relational ledger (id_map.txt).   
+
+Select Option 2: Automated Server Cron Management:   
+
+The menu lists every server discovered in your account.   
+
+Active [ENABLED] servers are sorted first alphabetically, followed by [DISABLED] servers alphabetically.   
+
+Default schedule for unconfigured servers is preset to Every Sunday at 2:00 AM (0 2 * * 0) with JSON formatting and media downloads enabled (--json --media).   
+
+Editing a proposed schedule expression or output format will keep the job DISABLED until you explicitly choose Toggle Status to enable it.
+
+You can customize the default settings across all new servers via Configure Global Default Cron Settings.
+
+Select Option 1: Ad-Hoc Backup Wizard whenever you want to run an instant, on-demand backup for a single server, channel, or direct message without waiting for the automated schedule.
 
 Welcome to data independence!
 
---------------------------------------------------------------------------------
-Version: v0.2.13 | Released: March 3, 2026 at 08:54 AM CST
-Engineered by GuppyGIRL and Hope Lockwood. Maintained by GuppyGIRL and Yui Kirigaya.
+Version: v1.3.2 | Released: September 19, 2026

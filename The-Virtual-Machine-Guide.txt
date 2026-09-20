@@ -1,88 +1,122 @@
-# Advice for the layman: The Virtual Machine Guide (v0.2.13 - March 3, 2026 at 08:54 AM CST)
+ADVICE FOR THE LAYMAN: THE VIRTUAL MACHINE GUIDE (v1.3.2)
 
-Welcome! If you are using a Mac, or if you are on Windows but prefer to use a full "Virtual Machine" instead of WSL, this guide is for you. 
+Welcome! If you are using a Mac, or if you are on Windows but prefer to use a full "Virtual Machine" instead of WSL, this guide is for you.
 
-A Virtual Machine (VM) is a fake, software-based computer running inside your real computer. It acts like a completely separate machine. By using a "pre-built" image, we can skip the complicated Linux installation entirely and get you running in minutes.
+A Virtual Machine (VM) is a software-based computer running inside your physical computer. It operates like a completely separate machine. By using a pre-built image, you can skip complex Linux installation steps and get running in minutes.
 
-### Phase 1: Choose Your Sandbox (The Hypervisor)
+Phase 1: Choose Your Sandbox (The Hypervisor)
 
-To run a virtual machine, you need a program called a "hypervisor." Choose the one that fits your computer, download it, and install it like a normal app:
+To run a virtual machine, you need a hypervisor program. Download and install the one that matches your operating system:
 
-* **If you want to use VMware Player (Windows/Linux):** See the **VMware Instructions** in Phase 3.
-* **If you want to use Oracle VirtualBox (Windows/Older Intel Macs):** See the **VirtualBox Instructions** in Phase 3.
-* **If you want to use UTM (Newer M1/M2/M3 Macs):** See the **UTM Instructions** in Phase 3.
-* **If you are an advanced user who wants to build Linux from scratch:** See the **Advanced Appendix** at the bottom of this page.
+VMware Workstation Player (Windows / Linux)
 
-### Phase 2: Download the Linux Brain (Pre-built Image)
+Oracle VirtualBox (Windows / Mac)
 
-Instead of building Linux from scratch, we are going to download a computer that is already set up and compressed into a single file. 
+UTM (Mac / Apple Silicon M-series)
 
-1. Open your web browser and go to a trusted community image site like **LinuxVMImages.com** or **OSBoxes.org**. 
-2. Search for either **CentOS 9 Stream** or **CentOS 10 Stream**. Our backup software works perfectly on both!
-3. **Important:** Download the file type that matches your hypervisor. 
-   * If using VirtualBox, download the **VirtualBox Image** (usually ends in `.vdi` or `.ova`).
-   * If using VMware, download the **VMware Image** (usually ends in `.vmdk` or `.ova`).
-   * If using UTM on a Mac, you can generally use the `.ova` or `.qcow2` format.
+(If you are an advanced user who wants to build Linux manually from an ISO image, see the Advanced Appendix at the bottom of this guide.)
 
-### Phase 3: Waking Up Your Machine
+Phase 2: Download the Linux Image (Pre-built Appliance)
 
-Now we will load that pre-built brain into your hypervisor.
+Instead of installing Linux from scratch, download a pre-configured image.
 
-**For VMware:**
-1. Open VMware Workstation Player.
-2. Click **Open a Virtual Machine**. 
-3. Find the `.ova` or `.vmdk` file you just downloaded and select it.
-4. Give your new machine a name (like "Discord Archive") and click **Import**. 
-5. Once it finishes, click **Play Virtual Machine**. 
+Open your web browser and visit a trusted enterprise or community image catalog (such as Rocky Linux or CentOS Stream appliances).
 
-**For VirtualBox:**
-1. Open Oracle VirtualBox.
-2. Go to **File** -> **Import Appliance**. 
-3. Select the `.ova` file you downloaded and click **Next**, then **Finish**.
-4. Once it appears in your list on the left, click it and press the green **Start** arrow.
+Search for a supported Red Hat Enterprise Linux (RHEL) family image, such as CentOS Stream 9/10, Rocky Linux 9, or AlmaLinux 9.
 
-**For UTM (Mac):**
-1. Open UTM.
-2. Click the **+** button to create a new VM. 
-3. Click **Virtualize**, then select **Linux**.
-4. Uncheck "Use Apple Virtualization" and click **Browse** to select your downloaded image file.
-5. Follow the prompts to give it 4GB of Memory (RAM) and finish the setup. Press the play button to turn it on!
+Download the format compatible with your hypervisor:
 
-*(Note: The website you downloaded the image from will provide the default username and password. It is usually something simple like `centos` for both the username and password!)*
+For VirtualBox: Download the VirtualBox image (.vdi or .ova).
 
-### Phase 4: Bridging the Worlds (Getting files in and out)
+For VMware: Download the VMware image (.vmdk or .ova).
 
-Your Linux machine is locked in a secure box. To get our installer script inside, we need to map a shared folder between your real computer and the fake one. 
+For UTM (Mac): Download the UTM or QEMU image (.ova or .qcow2).
 
-**If you are on Windows (VMware / VirtualBox):**
-1. In your hypervisor's top menu bar, look for **Virtual Machine Settings**.
-2. Find the tab labeled **Options** or **Shared Folders**.
-3. Turn it "On" and add your Windows **Downloads** folder.
-4. Inside your Linux terminal, this folder will now magically appear at `/mnt/hgfs/` (VMware) or `/media/sf_Downloads/` (VirtualBox).
+Phase 3: Importing and Starting Your Virtual Machine
 
-**If you are on a Mac (UTM / VirtualBox):**
-1. **UTM:** While the VM is running, look at the top toolbar of the UTM window. Click the folder icon (Shared Directory) and select your Mac's **Downloads** folder. Inside Linux, you will find these files by navigating to the `/media/` or `/run/media/` directory.
-2. **Alternative Mac Method (Drag and Drop):** If shared folders are fighting you, the easiest layman method is often built right in! In both VirtualBox and UTM, you can usually click on the `dcordbk-installer.bash` file on your Mac desktop, and simply **drag and drop** it right into the Linux virtual machine window. 
+Follow the steps below for your hypervisor:
 
-### Phase 5: Onward to Backup!
+For VMware:
 
-Your engine is built, fueled, and running. 
+Open VMware Workstation Player.
 
-You are now ready to install the Discord Archive Suite. Please return to the main **"Advice for the layman"** guide and begin at **Phase 4: Installing the Backup Software**. When that guide tells you to run the installer, just make sure you navigate to your new Shared Folder first!
+Select "Open a Virtual Machine" or "Import".
 
----
+Browse to your downloaded .ova or .vmdk file.
 
-### Appendix: For Advanced Users (Installing from ISO)
+Name your virtual machine (e.g., Discord-Archive-VM) and click Import.
 
-If you do not want to use a pre-built community image and prefer to partition and install the OS manually, follow these steps:
+Click "Play Virtual Machine" to start it.
 
-1. Download the official **DVD ISO** for CentOS 9 Stream or CentOS 10 Stream from `centos.org/download/`.
-2. Open your hypervisor and choose **Create a New Virtual Machine** (do not use "Import").
-3. Point the virtual CD-ROM drive to your downloaded ISO file.
-4. Allocate at least 2GB of RAM (4GB recommended) and a 20GB dynamically expanding virtual hard disk.
-5. Boot the VM and follow the CentOS Anaconda installer. Ensure you set a root password, create a user with administrative privileges, and accept the default automatic storage partitioning.
-6. Once rebooted, proceed to Phase 4 above to configure your shared folders.
+For VirtualBox:
 
---------------------------------------------------------------------------------
-Version: v0.2.13 | Released: March 3, 2026 at 08:54 AM CST
-Engineered by GuppyGIRL and Hope Lockwood. Maintained by GuppyGIRL and Yui Kirigaya.
+Open Oracle VirtualBox.
+
+Select File -> Import Appliance.
+
+Select your downloaded .ova file, click Next, then click Finish.
+
+Select the new virtual machine from the left menu and click Start.
+
+For UTM (Mac):
+
+Open UTM.
+
+Click the plus (+) button to create a new VM.
+
+Select Virtualize, then select Linux.
+
+Browse to your downloaded image file (.ova or .qcow2).
+
+Allocate at least 4 GB of RAM and finish the wizard. Press Play to boot the VM.
+
+(Note: Default login credentials are provided on the download page for your chosen image, often a simple username and password like "centos" or "rocky".)
+
+Phase 4: Setting Up Shared Folders (Transferring Files)
+
+Your virtual machine runs in an isolated environment. To copy the installer script inside, set up a shared folder between your host computer and the VM.
+
+For Windows Hosts (VMware / VirtualBox):
+
+Open Virtual Machine Settings in your hypervisor menu.
+
+Navigate to Options or Shared Folders.
+
+Enable Shared Folders and map your host Downloads directory.
+
+In your Linux terminal, the folder appears at /mnt/hgfs/ (VMware) or /media/sf_Downloads/ (VirtualBox).
+
+For Mac Hosts (UTM / VirtualBox):
+
+In UTM, click the Shared Directory folder icon on the top toolbar and select your host Downloads folder.
+
+In your Linux terminal, navigate to /media/ or /run/media/ to access the shared files.
+
+Alternatively, drag and drop the dcordbk-installer.bash script directly from your Mac desktop into the VM terminal window if supported by your hypervisor.
+
+Phase 5: Deploying the Backup Suite
+
+Your Linux virtual machine is running and connected to your shared folder.
+
+Return to the main "Advice for the Layman" installation guide.
+
+Open your VM terminal, navigate to your shared folder (e.g., cd /mnt/hgfs/Downloads/ or your mapped path), and run:
+bash dcordbk-installer.bash
+
+Follow Phase 4 through Phase 6 of the main guide to complete installation, token configuration, and automated cron setup.
+
+Appendix: Advanced Users (ISO Installation)
+
+If you prefer to perform a custom installation from an ISO file:
+
+Download the official DVD ISO for CentOS Stream 9/10, Rocky Linux 9, or AlmaLinux 9.
+
+Create a new virtual machine in your hypervisor and attach the ISO to the virtual optical drive.
+
+Allocate at least 2 GB of RAM (4 GB recommended) and a 20 GB virtual disk.
+
+Complete the standard Linux installer wizard (setting root password and creating an administrative user).
+
+Boot into your new system and proceed with shared folder mapping and installation.
+
+Version: v1.3.2 | Released: September 19, 2026

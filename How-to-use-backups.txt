@@ -1,36 +1,56 @@
-# How to use the backups you make (v0.2.13 - March 3, 2026 at 08:54 AM CST)
+HOW TO USE THE BACKUPS YOU MAKE (v1.3.2)
 
-Welcome! You have successfully set up the Discord Archive Suite (currently on version 0.2.13) and your computer is silently saving your history. But what exactly is it saving, and how do you look at it? 
+Welcome! This guide explains how the Discord Archive Suite (v1.3.2) operates, what it saves, and how you will access and manage your history once the suite is deployed on your system.
 
-### 1. The Golden Rule: We are building a Museum, not a Time Machine
-The most common question we get is: *"How do I restore these messages back into Discord?"*
+The Golden Rule: We are building a Museum, not a Time Machine
+A common question before installing is: "How do I restore these messages back into Discord?"
 
-**The short answer is: You cannot.** Discord's security architecture makes true "restoration" impossible. Discord does not allow users or bots to forge the author ID or timestamp of a message. If you were to build a bot to push your archived text back into a new server, every single message would show up as being written by the bot *today*, rather than by your friends three years ago. 
+The short answer is: You cannot. Discord's security architecture makes true "restoration" impossible. Discord does not allow users or bots to forge author IDs or original timestamps. If you were to run a bot to push archived text back into a new server, every message would appear as if written by the bot today, rather than by your friends years ago.
 
-This software is strictly a one-way read-and-archive engine. We are giving you a permanent, offline museum of your data so you never lose your memories, even if Discord goes offline or an account is deleted.
+This software is strictly a one-way read-and-archive engine. It provides a permanent, offline museum of your data so you never lose your memories, even if Discord goes offline or an account is deleted.
 
-### 2. The Master Log
-Even though we cannot push messages back, the software keeps a meticulous record of everything it sees. Inside your configuration folder, the suite maintains a master ledger. This is a master log of every single Server, Category, Channel, and Direct Message your account has access to, mapping their internal computer codes to their human-readable names. 
+The Relational Ledger & Configuration Vault
+Once installed, the suite maintains a hidden .conf/ directory inside your designated storage root (e.g., /path/to/discord_archive/). This directory contains the operational framework for your installation:
 
-### 3. Finding Your Files (Semantic Naming & DM Siloing)
-When the automated schedule runs, it drops your backups into your `Discord_Archive` folder. As of v0.2.13, these archives are semantically named so you know exactly what is inside them before opening them (e.g., `2026-03-03_Hotboys_Hot_Lanes.tar.xz`).
+id_map.txt (v3.0 Relational Ledger): A flat-file mapping of every Server (Guild), Category, Channel, and Direct Message your account can access, linking numeric Discord IDs to human-readable names.
 
-Furthermore, Direct Messages are strictly siloed. Personal conversations are vaulted into entirely separate archives (e.g., `2026-03-03_DMS.tar.xz`) and are never bundled with server data.
+cron_targets.txt: Stores your per-server schedule choices, flags, and enabled/disabled states.
 
-* **If you are on Linux or a Virtual Machine:** You will find your backups sitting right in your archive directory (e.g., `~/Discord_Archive/` or `/usr/local/discord_archive/`). You can easily move these to your Mac or Windows machine using Shared Folders.
-* **If you are on Windows using WSL:** You can access your hidden Linux files directly from Windows! Open your standard Windows File Explorer. In the address bar at the very top, type `\\wsl$\CentOS\` and press Enter. Navigate to your archive directory and you can drag and drop these files to your normal Windows Desktop.
+default_cron.conf: Stores your global default cron schedule and output preferences.
 
-### 4. Opening the Archives (.tar.xz)
-To save massive amounts of hard drive space, our software squishes your backups into a highly compressed format called `.tar.xz`. Think of it like a super-powered `.zip` file.
+.token: Secure, local plain-text storage for your Discord authorization token.
 
-* **How to open it on Windows:** Standard Windows cannot open these yet. You will need to download a free, safe program called **7-Zip** (or WinRAR). Once installed, just right-click your backup file, select 7-Zip, and choose "Extract Here". 
-* **How to open it on Linux/Mac:** Open your terminal, navigate to the folder containing the backup, and type: `tar -xf filename.tar.xz` (replace 'filename' with the actual name of your file).
+Folder Siloing, Staging & Mount Guards
+The suite is engineered to keep your archives structured and protected against network or storage failures:
 
-### 5. Why are there ID numbers inside the folders?
-When you extract your beautifully named backup archive, you might notice that the specific channels *inside* the folder still rely on strings of random numbers (Discord IDs) to organize things. 
+Dedicated Directory Siloing: Each server is automatically assigned its own dedicated folder inside your archive root (e.g., /path/to/discord_archive/Server_Alpha/). Direct Messages are strictly isolated into a separate /path/to/discord_archive/Direct_Messages/ vault and are never mixed with server data.
 
-Why do we do this? Discord allows users to put almost anything in their channel names—including emojis, crazy symbols, and strange spacing. If we tried to name a Linux folder using a dancing parrot emoji, the computer's file system would completely crash! By using Discord's unique numeric IDs internally, we guarantee your backups will never fail due to a weird character.
+Pre-Flight Mount Guard: Before any download or export begins, the dcordbk master engine queries findmnt to verify that your storage path (such as a network/cloud drive mount) is actively attached. If the mount drops, the engine halts execution immediately rather than dumping data onto your local Linux drive.
 
---------------------------------------------------------------------------------
-Version: v0.2.13 | Released: March 3, 2026 at 08:54 AM CST
-Engineered by GuppyGIRL and Hope Lockwood. Maintained by GuppyGIRL and Yui Kirigaya. 
+Local Ext4 Staging Pipeline: To bypass slow network drive latency (such as 9p DrvFs writes), all raw dumps and media attachment downloads execute inside a local Linux temp buffer (/tmp/dcordbk_stage_$$). The suite compresses the batch into a single .tar.xz file locally using multi-core processing (xz -9e -T0) and then streams that single archive to your target storage in one quick move.
+
+Accessing Your Files from Windows (WSL Users):
+You will be able to access your archive directory directly from Windows Explorer. Open File Explorer, type your WSL distribution network path in the address bar (for example: \wsl.localhost<DistroName>\path\to\discord_archive), and press Enter.
+
+Default Formatting & Compressed Archives (.tar.xz)
+By default, all scheduled exports run with JSON format and Media attachments enabled (--json --media). This provides raw, structured data parsing alongside full archival of images, videos, and embedded media.
+
+To save drive space, backups are squashed into multi-core compressed .tar.xz archives (e.g., 2026-09-19_DMS.tar.xz or 2026-09-19_Server_Alpha.tar.xz).
+
+Opening on Windows: Download 7-Zip or WinRAR. Right-click the .tar.xz file, select 7-Zip, and choose "Extract Here".
+
+Opening on Linux/Mac: Open terminal, navigate to the folder, and run: tar -xf filename.tar.xz.
+
+Automated Per-Server Cron Management (dbkui)
+When you launch dbkui and enter Option 2: Automated Server Cron Management, you will configure schedules via an interactive terminal menu:
+
+Sorted Pre-Populated Matrix: The menu automatically scans your ledger (id_map.txt) and lists every server you belong to. Servers with an active [ENABLED] backup appear first alphabetically, followed by [DISABLED] servers alphabetically.
+
+Non-Destructive State Protection: Editing a proposed schedule expression or changing output formats (JSON, HTML, or Plain Text) will not automatically enable the job. A server cron remains disabled until you explicitly select Toggle Status.
+
+Global Defaults: You can define a custom default schedule (preset to Every Sunday at 2:00 AM: 0 2 * * 0) and default flags under Configure Global Default Cron Settings.
+
+Why numeric IDs are used inside extracted folders
+When you extract a backup archive, individual channel folders inside still use numeric Discord IDs alongside channel names. Discord allows users to put special characters, emojis, and custom formatting in channel names. Using numeric IDs internally ensures that unusual characters or emojis in Discord channel names never cause directory creation or filesystem errors in Linux.
+
+Version: v1.3.2 | Released: September 19, 2026
